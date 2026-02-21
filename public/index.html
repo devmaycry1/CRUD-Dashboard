@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Funcionários</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <main class="container">
+        <div class="cadastro-cabecalho">
+            <svg class="logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="18" r="10" fill="#4f46e5" />
+                <rect x="14" y="30" width="36" height="20" rx="10" fill="#6366f1" />
+                <rect x="8" y="40" width="48" height="18" rx="9" fill="#818cf8" />
+            </svg>
+            <h1 class="titulo">Gestão Funcionários</h1>
+        </div>
+        <section class="section">
+            <h2 class="titulo-section">Cadastro</h2>
+            <form class="formulario" id="formFuncionario">
+                <fieldset>
+                    <legend class="formulario-legenda">
+                        Informações
+                    </legend>
+
+                    <div class="input-container">
+                        <input class="input" type="text" name="nome" id="nome" placeholder="Nome" data-tipo="nome"
+                            required>
+                        <label class="input-label" for="nome">Nome</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                    <div class="input-container">
+                        <input class="input" type="email" name="email" id="email" placeholder="Email" data-tipo="email"
+                            required>
+                        <label class="input-label" for="email">Email</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                    <div class="input-container">
+                        <input class="input" type="text" name="cargo" id="cargo" placeholder="Cargo" data-tipo="cargo"
+                            required>
+                        <label class="input-label" for="cargo">Cargo</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                    <div class="input-container">
+                        <input class="input" type="text" name="departamento" id="departamento"
+                            placeholder="Departamento" data-tipo="departamento" required>
+                        <label class="input-label" for="departamento">Departamento</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                    <div class="input-container">
+                        <input class="input" type="number" name="salario" id="salario" placeholder="Salário"
+                            data-tipo="salario" required>
+                        <label class="input-label" for="salario">Salário</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                    <div class="input-container">
+                        <input class="input" type="date" name="data_adm" id="data_adm" placeholder="Data de Admissão"
+                            data-tipo="data_adm" required>
+                        <label class="input-label" for="data_adm">Data de Admissão</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                    <div class="input-container">
+                        <select class="input" name="status" id="status">
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                        </select>
+                        <label class="input-label" for="status">Status</label>
+                        <span class="input-mensagem-erro">Este campo não está válido</span>
+                    </div>
+
+                </fieldset>
+                <div class="botao-container">
+                    <button class="botao">Cadastrar</button>
+                </div>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Cargo</th>
+                        <th>Departamento</th>
+                        <th>Salário</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaFuncionarios"></tbody>
+            </table>
+        </section>
+    </main>
+
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>
