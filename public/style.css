@@ -79,6 +79,7 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 1.5rem;
+    gap: 10px;
 }
 
 .botao {
@@ -265,4 +266,44 @@ fieldset {
 
 tbody tr:nth-child(even) {
     background: #f1f5f9;
+}
+
+td button {
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.botao-editar {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.botao-editar:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.botao-excluir {
+    background-color: #ef4444;
+    color: white;
+}
+
+.botao-excluir:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+td button:active {
+    transform: scale(0.95);
+}
+
+td:last-child {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
 }

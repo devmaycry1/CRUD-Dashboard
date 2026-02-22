@@ -49,6 +49,22 @@ app.get('/funcionarios', (req, res) => {
   });
 });
 
+app.get("/funcionarios/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.get("SELECT * FROM funcionarios WHERE id = ?", [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ erro: err.message });
+        }
+
+        if (!row) {
+            return res.status(404).json({ erro: "Funcionário não encontrado" });
+        }
+
+        res.json(row);
+    });
+});
+
 
 app.post('/funcionarios', (req, res) => {
   const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
