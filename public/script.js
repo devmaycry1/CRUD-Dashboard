@@ -24,6 +24,7 @@ async function carregarFuncionarios() {
       <td>${f.cargo ?? ""}</td>
       <td>${f.departamento ?? ""}</td>
       <td>R$ ${f.salario ?? ""}</td>
+      <td>${formatarData(f.data_admissao)}</td>
       <td>${f.status ?? ""}</td>
     `;
 
@@ -59,7 +60,7 @@ async function salvarFuncionario(e) {
         cargo: form.cargo.value,
         departamento: form.departamento.value,
         salario: form.salario.value,
-        data_adm: form.data_adm.value,
+        data_admissao: form.data_admissao.value,
         status: form.status.value
     };
 
@@ -117,7 +118,7 @@ async function editarFuncionario(id) {
     form.cargo.value = f.cargo;
     form.departamento.value = f.departamento;
     form.salario.value = f.salario;
-    form.data_adm.value = f.data_adm;
+    form.data_admissao.value = f.data_admissao;
     form.status.value = f.status;
 
     idEmEdicao = id;
@@ -135,4 +136,11 @@ function cancelarEdicao() {
     botaoSalvar.classList.remove("editando");
 
     botaoCancelar.style.display = "none";
+}
+
+function formatarData(dataISO) {
+    if (!dataISO) return "";
+
+    const data = new Date(dataISO);
+    return data.toLocaleDateString("pt-BR");
 }
