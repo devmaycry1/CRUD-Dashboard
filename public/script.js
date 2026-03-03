@@ -1,3 +1,6 @@
+import { valida } from './validacao.js'
+
+const inputs = document.querySelectorAll('input')
 const API = 'http://localhost:3000/funcionarios';
 const tabela = document.getElementById('tabelaFuncionarios');
 const form = document.getElementById('formCadastro');
@@ -9,16 +12,23 @@ window.addEventListener('load', carregarFuncionarios)
 botaoCancelar.addEventListener('click', cancelarEdicao)
 form.addEventListener('submit', salvarFuncionario)
 
+inputs.forEach(input => {
+    input.addEventListener('blur', (evento) => {
+        valida(evento.target)
+    })
+})
+
 async function carregarFuncionarios() {
-    const resposta = await fetch(API);
-    const funcionarios = await resposta.json();
+    try {
+        const resposta = await fetch(API);
+        const funcionarios = await resposta.json();
 
-    tabela.innerHTML = "";
+        tabela.innerHTML = "";
 
-    funcionarios.forEach(f => {
-        const linha = document.createElement("tr");
+        funcionarios.forEach(f => {
+            const linha = document.createElement("tr");
 
-        linha.innerHTML = `
+            linha.innerHTML = `
       <td>${f.nome}</td>
       <td>${f.email ?? ""}</td>
       <td>${f.cargo ?? ""}</td>
@@ -28,31 +38,46 @@ async function carregarFuncionarios() {
       <td>${f.status ?? ""}</td>
     `;
 
-        const tdAcoes = document.createElement("td");
+            const tdAcoes = document.createElement("td");
 
-        const botaoEditar = document.createElement("button");
-        botaoEditar.textContent = "Editar";
-        botaoEditar.classList.add('botao-editar')
-        botaoEditar.addEventListener("click", () => editarFuncionario(f.id));
+            const botaoEditar = document.createElement("button");
+            botaoEditar.textContent = "Editar";
+            botaoEditar.classList.add('botao-editar')
+            botaoEditar.addEventListener("click", () => editarFuncionario(f.id));
 
-        const botaoExcluir = document.createElement("button");
-        botaoExcluir.textContent = "Excluir";
-        botaoExcluir.classList.add('botao-excluir')
-        botaoExcluir.addEventListener("click", () => removerFuncionario(f.id));
+            const botaoExcluir = document.createElement("button");
+            botaoExcluir.textContent = "Excluir";
+            botaoExcluir.classList.add('botao-excluir')
+            botaoExcluir.addEventListener("click", () => removerFuncionario(f.id));
 
-        tdAcoes.appendChild(botaoEditar);
-        tdAcoes.appendChild(botaoExcluir);
+            tdAcoes.appendChild(botaoEditar);
+            tdAcoes.appendChild(botaoExcluir);
 
-        linha.appendChild(tdAcoes);
-        tabela.appendChild(linha);
+            linha.appendChild(tdAcoes);
+            tabela.appendChild(linha);
 
-    });
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar", error)
+        alert("Não foi possível carregar os funcionários!")
+
+    }
+
 }
 
 carregarFuncionarios();
 
 async function salvarFuncionario(e) {
     e.preventDefault();
+
+    inputs.forEach(input => valida(input))
+
+    if (!form.checkValidity()) {
+        return;
+
+    }
+
 
     const funcionario = {
         nome: form.nome.value,
@@ -102,30 +127,46 @@ async function salvarFuncionario(e) {
 async function removerFuncionario(id) {
     if (!confirm("Deseja excluir este funcionário?")) return;
 
-    await fetch(`${API}/${id}`, {
-        method: "DELETE"
-    });
+    try {
+        await fetch(`${API}/${id}`, {
+            method: "DELETE"
+        });
 
-    carregarFuncionarios();
+        carregarFuncionarios();
+
+
+    } catch (error) {
+        console.error("Erro ao remover:", error);
+        alert("Erro ao remover funcionário.");
+
+    }
+
 }
 
 async function editarFuncionario(id) {
-    const resposta = await fetch(`${API}/${id}`);
-    const f = await resposta.json();
+    try {
+        const resposta = await fetch(`${API}/${id}`);
+        const f = await resposta.json();
 
-    form.nome.value = f.nome;
-    form.email.value = f.email;
-    form.cargo.value = f.cargo;
-    form.departamento.value = f.departamento;
-    form.salario.value = f.salario;
-    form.data_admissao.value = f.data_admissao;
-    form.status.value = f.status;
+        form.nome.value = f.nome;
+        form.email.value = f.email;
+        form.cargo.value = f.cargo;
+        form.departamento.value = f.departamento;
+        form.salario.value = f.salario;
+        form.data_admissao.value = f.data_admissao;
+        form.status.value = f.status;
 
-    idEmEdicao = id;
+        idEmEdicao = id;
 
-    botaoSalvar.textContent = "Atualizar";
-    botaoSalvar.classList.add("editando");
-    botaoCancelar.style.display = "inline-block";
+        botaoSalvar.textContent = "Atualizar";
+        botaoSalvar.classList.add("editando");
+        botaoCancelar.style.display = "inline-block";
+
+    } catch (error) {
+        console.error("Erro ao buscar dados para edição:", error);
+        alert("Erro ao carregar dados do funcionário.");
+
+    }
 }
 
 function cancelarEdicao() {
@@ -136,6 +177,12 @@ function cancelarEdicao() {
     botaoSalvar.classList.remove("editando");
 
     botaoCancelar.style.display = "none";
+
+    inputs.forEach(input => {
+        input.parentElement.classList.remove('input-container--invalido');
+        const spanMensagem = input.parentElement.querySelector('.input-mensagem-erro');
+        if (spanMensagem) spanMensagem.innerHTML = '';
+    });
 }
 
 function formatarData(dataISO) {
