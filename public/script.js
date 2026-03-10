@@ -7,6 +7,11 @@ const form = document.getElementById('formCadastro');
 let idEmEdicao = null;
 const botaoSalvar = document.getElementById('botaoSalvar')
 const botaoCancelar = document.getElementById('botaoCancelar')
+const botaoExportar = document.getElementById("botaoExportar");
+
+botaoExportar.addEventListener("click", () => {
+    window.location.href = "http://localhost:3000/exportar-csv";
+});
 
 window.addEventListener('load', carregarFuncionarios)
 botaoCancelar.addEventListener('click', cancelarEdicao)

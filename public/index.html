@@ -7,18 +7,16 @@
     <title>Gestão de Funcionários</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <main class="container">
         <div class="cadastro-cabecalho">
-            <svg class="logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="32" cy="18" r="10" fill="#4f46e5" />
-                <rect x="14" y="30" width="36" height="20" rx="10" fill="#6366f1" />
-                <rect x="8" y="40" width="48" height="18" rx="9" fill="#818cf8" />
-            </svg>
-            <h1 class="titulo">Gestão Funcionários</h1>
+           <img src="./assets/Logo.png" class="logo" alt="">
+            <h1 class="titulo">Funcionários</h1>
         </div>
         <section class="section">
             <h2 class="titulo-section">Cadastro</h2>
@@ -64,8 +62,8 @@
                     </div>
 
                     <div class="input-container">
-                        <input class="input" type="date" name="data_admissao" id="data_admissao" placeholder="Data de Admissão"
-                            data-tipo="data_admissao" required>
+                        <input class="input" type="date" name="data_admissao" id="data_admissao"
+                            placeholder="Data de Admissão" data-tipo="data_admissao" required>
                         <label class="input-label" for="data_admissao">Data de Admissão</label>
                         <span class="input-mensagem-erro">Este campo não está válido</span>
                     </div>
@@ -101,6 +99,9 @@
                 </thead>
                 <tbody id="tabelaFuncionarios"></tbody>
             </table>
+            <div class="exportar-container">
+                <button id="botaoExportar" class="botao-exportar">Exportar CSV</button>
+            </div>
         </section>
     </main>
 

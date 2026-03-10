@@ -9,7 +9,7 @@ app.use(express.json());
 const db = new sqlite3.Database('./database.db');
 
 db.serialize(() => {
-    const sql = `
+  const sql = `
   CREATE TABLE IF NOT EXISTS funcionarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -22,21 +22,21 @@ db.serialize(() => {
   );
   `;
 
-    db.run(sql, (err) => {
-        if (err) {
-            console.error("Erro ao criar tabela:", err.message);
-        } else {
-            console.log("Banco de dados pronto.");
-        }
-    });
+  db.run(sql, (err) => {
+    if (err) {
+      console.error("Erro ao criar tabela:", err.message);
+    } else {
+      console.log("Banco de dados pronto.");
+    }
+  });
 });
 app.get('/', (req, res) => {
-    res.send('API Funcionando!');
+  res.send('API Funcionando!');
 });
 
 
 app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
+  console.log('Servidor rodando em http://localhost:3000');
 });
 
 app.get('/funcionarios', (req, res) => {
@@ -50,19 +50,19 @@ app.get('/funcionarios', (req, res) => {
 });
 
 app.get("/funcionarios/:id", (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    db.get("SELECT * FROM funcionarios WHERE id = ?", [id], (err, row) => {
-        if (err) {
-            return res.status(500).json({ erro: err.message });
-        }
+  db.get("SELECT * FROM funcionarios WHERE id = ?", [id], (err, row) => {
+    if (err) {
+      return res.status(500).json({ erro: err.message });
+    }
 
-        if (!row) {
-            return res.status(404).json({ erro: "Funcionário não encontrado" });
-        }
+    if (!row) {
+      return res.status(404).json({ erro: "Funcionário não encontrado" });
+    }
 
-        res.json(row);
-    });
+    res.json(row);
+  });
 });
 
 
@@ -74,7 +74,7 @@ app.post('/funcionarios', (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status], function(err) {
+  db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status], function (err) {
     if (err) {
       res.status(500).json({ erro: err.message });
       return;
@@ -93,7 +93,7 @@ app.put('/funcionarios/:id', (req, res) => {
     WHERE id=?
   `;
 
-  db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status, id], function(err) {
+  db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status, id], function (err) {
     if (err) {
       res.status(500).json({ erro: err.message });
       return;
@@ -105,7 +105,7 @@ app.put('/funcionarios/:id', (req, res) => {
 app.delete('/funcionarios/:id', (req, res) => {
   const { id } = req.params;
 
-  db.run("DELETE FROM funcionarios WHERE id=?", id, function(err) {
+  db.run("DELETE FROM funcionarios WHERE id=?", id, function (err) {
     if (err) {
       res.status(500).json({ erro: err.message });
       return;
@@ -113,3 +113,21 @@ app.delete('/funcionarios/:id', (req, res) => {
     res.json({ mensagem: "Funcionário removido" });
   });
 });
+
+app.get('/exportar', (req, res) => {
+  db.all("SELECT * FROM funcionarios", [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ erro: err.message });
+    }
+
+    let csv = "id,nome,email,cargo,departamento,salario,data_admissao,status\n";
+
+    rows.forEach(f => {
+      csv += `${f.id},${f.nome},${f.email},${f.cargo},${f.departamento},${f.salario},${f.data_admissao},${f.status}\n`;
+    });
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("funcionarios.csv");
+    res.send(csv);
+  });
+})
