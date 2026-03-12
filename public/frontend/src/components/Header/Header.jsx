@@ -1,0 +1,53 @@
+import { useNavigate } from "react-router-dom";
+
+export default function Header() {
+
+  const navigate = useNavigate();
+
+  function exportarCSV() {
+    window.location.href = "http://localhost:3000/exportar";
+  }
+
+  function abrirDashboard() {
+    window.open(
+      "https://docs.google.com/spreadsheets",
+      "_blank"
+    );
+  }
+
+  return (
+    <div className="dashboard-header">
+
+      <div>
+        <h1>Funcionários</h1>
+        <p>Gerencie sua equipe</p>
+      </div>
+
+      <div className="actions">
+
+        <button
+          className="btn dashboard"
+          onClick={abrirDashboard}
+        >
+          Dashboard
+        </button>
+
+        <button
+          className="btn secondary"
+          onClick={exportarCSV}
+        >
+          Exportar CSV
+        </button>
+
+        <button
+          className="btn primary"
+          onClick={() => navigate("/cadastro")}
+        >
+          Novo Funcionário
+        </button>
+
+      </div>
+
+    </div>
+  );
+}

@@ -1,0 +1,303 @@
+:root {
+    --fonte-familia-corpo: 'Montserrat', sans-serif;
+    --fonte-familia-logo: 'Outfit', sans-serif;
+
+    --cor-primaria: #0071ea;
+    --cor-secundaria: #d6eaff;
+
+    --cor-contraste-escuro: #E6EDF3;
+    --cor-contraste-claro: #fff;
+
+    --cor-aviso: #ff5252;
+    --cor-sucesso: #047900;
+
+    --sombra: 0 5px 10px #55a6ff38;
+}
+
+body {
+    margin: 0;
+    font-family: var(--fonte-familia-corpo);
+
+    background-image: url("./assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    color: var(--cor-contraste-escuro);
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-mensagem-erro {
+    font-size: 13px;
+    color: #ff5252;
+    margin-top: 4px;
+}
+
+.input-container--invalido input {
+    border: 1px solid #ff5252;
+}
+
+.page {
+    min-height: 100vh;
+}
+
+.main-content {
+    padding: 40px;
+}
+
+.main-content h1 {
+    text-align: center;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    padding: 0 20px;
+    z-index: 1000;
+
+    backdrop-filter: blur(14px);
+    background: rgba(15, 23, 42, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-container {
+    padding: 14px 24px;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+    cursor: pointer;
+}
+
+.logo-icon {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    color: white;
+    font-weight: bold;
+}
+
+.btn {
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.btn.dashboard {
+    background: linear-gradient(135deg,
+            rgba(255, 81, 0, 0.61),
+            rgba(255, 102, 0, 0.466));
+    color: white;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg,
+            rgba(0, 123, 255, 0.55),
+            rgba(0, 89, 255, 0.55));
+    color: white;
+}
+
+.btn.secondary {
+    background: linear-gradient(135deg,
+            rgba(0, 255, 94, 0.45),
+            rgba(0, 253, 93, 0.35));
+    color: white;
+}
+
+.btn.cancel {
+    background: linear-gradient(135deg,
+            rgba(255, 0, 0, 0.45),
+            rgba(231, 23, 8, 0.39));
+    color: #f1f5f9;
+}
+
+.btn.cancel:hover {
+    transform: translateY(-2px);
+}
+
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.form {
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form input,
+.form select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #dbeafe;
+
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+
+    backdrop-filter: blur(10px);
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.tabela-funcionarios {
+    width: 100%;
+    border-collapse: collapse;
+
+    background: rgba(20, 40, 80, 0.35);
+    backdrop-filter: blur(10px);
+
+    border-radius: 10px;
+}
+
+thead {
+    background: linear-gradient(135deg,
+            #0f172a,
+            #1e293b);
+    color: white;
+}
+
+th,
+td {
+    padding: 12px 14px;
+}
+
+tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: 0.2s;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+
+td button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-right: 8px;
+}
+
+td button:hover {
+    transform: translateY(-1px);
+}
+
+.botao-editar {
+    background: linear-gradient(135deg,
+            rgba(0, 115, 255, 0.45),
+            rgba(0, 81, 255, 0.35));
+    color: white;
+}
+
+.botao-excluir {
+    background: linear-gradient(135deg,
+            rgba(255, 0, 0, 0.45),
+            rgba(255, 0, 0, 0.35));
+    color: white;
+}
+
+.logo-text {
+    font-family: var(--fonte-familia-logo);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+
+.section {
+    background: rgba(20, 40, 80, 0.35);
+    backdrop-filter: blur(10px);
+
+    border-radius: 10px;
+    padding: 25px;
+
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}

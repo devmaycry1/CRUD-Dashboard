@@ -2,8 +2,8 @@ const tiposDeErro = [
     'valueMissing',
     'typeMismatch',
     'customError',
-    'rangeUnderflow', 
-    'stepMismatch'  
+    'rangeUnderflow',
+    'stepMismatch'
 ];
 
 const mensagensDeErro = {
@@ -29,6 +29,7 @@ const mensagensDeErro = {
 
 function mostraMensagemDeErro(tipoInput, input) {
     let mensagem = '';
+
     tiposDeErro.forEach(erro => {
         if (input.validity[erro]) {
             mensagem = mensagensDeErro[tipoInput]?.[erro] || 'Campo preenchido incorretamente.';
@@ -40,7 +41,6 @@ function mostraMensagemDeErro(tipoInput, input) {
 
 export function valida(input) {
     const tipoInput = input.dataset.tipo;
-
 
     const spanMensagemErro = input.parentElement.querySelector('.input-mensagem-erro');
 
