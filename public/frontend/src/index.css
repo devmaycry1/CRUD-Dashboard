@@ -18,7 +18,7 @@ body {
     margin: 0;
     font-family: var(--fonte-familia-corpo);
 
-    background-image: url("./assets/background.png");
+    background-image: url("./assets/Background.png");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -43,6 +43,7 @@ body {
 
 .page {
     min-height: 100vh;
+    animation: pageFade 0.35s ease;
 }
 
 .main-content {
@@ -126,13 +127,13 @@ body {
     cursor: pointer;
     font-weight: 500;
     font-size: 16px;
-    transition: all 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn.dashboard {
     background: linear-gradient(135deg,
-            rgba(255, 81, 0, 0.61),
-            rgba(255, 102, 0, 0.466));
+            rgba(255, 123, 0, 0.61),
+            rgba(255, 102, 0, 0.658));
     color: white;
 }
 
@@ -159,11 +160,13 @@ body {
 
 .btn.cancel:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 
 .btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .dashboard-header {
@@ -192,6 +195,7 @@ body {
 .form select {
     padding: 12px;
     border-radius: 8px;
+    font-size: 16px;
     border: 1px solid #dbeafe;
 
     background: rgba(255, 255, 255, 0.1);
@@ -254,7 +258,8 @@ td button {
 }
 
 td button:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .botao-editar {
@@ -282,11 +287,10 @@ td button:hover {
 .section {
     background: rgba(20, 40, 80, 0.35);
     backdrop-filter: blur(10px);
-
     border-radius: 10px;
     padding: 25px;
-
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: containerFade 0.45s ease;
 }
 
 .logo {
@@ -300,4 +304,28 @@ td button:hover {
     justify-content: center;
     gap: 12px;
     margin-top: 20px;
+}
+
+@keyframes containerFade {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pageFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
