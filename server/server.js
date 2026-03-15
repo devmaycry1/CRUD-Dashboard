@@ -5,10 +5,14 @@ const cors = require('cors');
 const app = express();
 app.use(cors({
   origin: [
-    "http://localhost:5173", // dev local (Vite)
-    "https://crud-dashboard-ruddy.vercel.app/"
-  ]
+    "https://crud-dashboard-ruddy.vercel.app",
+    "http://localhost:5173"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"]
 }));
+
+app.options('*', cors());
 app.use(express.json());
 app.use(express.json());
 
