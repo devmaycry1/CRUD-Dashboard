@@ -5,7 +5,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   function exportarCSV() {
-    window.location.href = "http://localhost:3000/exportar";
+    window.location.href = "https://server-crimson-haze-2799.fly.dev/exportar";
   }
 
   function abrirDashboard() {

@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import Header from "../../components/Header/Header";
 import UserTable from "../../components/UserTable/UserTable";
 
-const API = "http://localhost:3000/funcionarios";
+const API = "https://server-crimson-haze-2799.fly.dev/funcionarios";
 
 export default function Home() {
 

@@ -34,7 +34,7 @@ export default function Register() {
 
         if (!formularioValido) return;
 
-        await fetch("http://localhost:3000/funcionarios", {
+        await fetch("https://server-crimson-haze-2799.fly.dev/funcionarios", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

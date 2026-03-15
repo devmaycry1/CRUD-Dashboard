@@ -3,10 +3,17 @@ const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173", // dev local (Vite)
+    "https://crud-dashboard-ruddy.vercel.app/"
+  ]
+}));
+app.use(express.json());
 app.use(express.json());
 
-const db = new sqlite3.Database('./database.db');
+const dbPath = process.env.DATABASE_URL || '/data/database.db';
+const db = new sqlite3.Database(dbPath);
 
 db.serialize(() => {
   const sql = `
@@ -35,8 +42,10 @@ app.get('/', (req, res) => {
 });
 
 
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 app.get('/funcionarios', (req, res) => {
