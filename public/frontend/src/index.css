@@ -18,7 +18,7 @@ body {
     margin: 0;
     font-family: var(--fonte-familia-corpo);
 
-    background-image: url("/public/frontend/public/Background.png");
+    background-image: url("/public/assets/Background.png");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
