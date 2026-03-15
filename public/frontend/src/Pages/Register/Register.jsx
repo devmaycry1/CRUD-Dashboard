@@ -86,7 +86,9 @@ export default function Register() {
         <div className="page">
             <div className="main-content">
 
-                {id ? "Editar Funcionário" : "Novo Funcionário"}
+                <h1>
+                    {id ? "Editar Funcionário" : "Novo Funcionário"}
+                </h1>
 
                 <form className="form" onSubmit={handleSubmit} noValidate>
 
