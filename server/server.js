@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.json());
 
 const dbPath = process.env.DATABASE_URL || '/data/database.db';
 const db = new sqlite3.Database(dbPath);
@@ -91,16 +90,12 @@ app.put('/funcionarios/:id', (req, res) => {
   const { id } = req.params;
   const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
 
-  const sql = `
-    UPDATE funcionarios
-    SET nome=?, email=?, cargo=?, departamento=?, salario=?, data_admissao=?, status=?
-    WHERE id=?
-  `;
+  const sql = `UPDATE funcionarios SET nome=?, email=?, cargo=?, departamento=?, salario=?, data_admissao=?, status=? WHERE id=?`;
 
   db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status, id], function (err) {
     if (err) {
-      res.status(500).json({ erro: err.message });
-      return;
+      console.error(err.message);
+      return res.status(500).json({ erro: err.message });
     }
     res.json({ mensagem: "Funcionário atualizado" });
   });
@@ -108,11 +103,9 @@ app.put('/funcionarios/:id', (req, res) => {
 
 app.delete('/funcionarios/:id', (req, res) => {
   const { id } = req.params;
-
-  db.run("DELETE FROM funcionarios WHERE id=?", id, function (err) {
+  db.run("DELETE FROM funcionarios WHERE id=?", [id], function (err) {
     if (err) {
-      res.status(500).json({ erro: err.message });
-      return;
+      return res.status(500).json({ erro: err.message });
     }
     res.json({ mensagem: "Funcionário removido" });
   });
