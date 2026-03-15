@@ -11,8 +11,7 @@ COPY . .
 
 USER root
 RUN mkdir -p /data && chown -R node:node /data
-
-USER node
+RUN chown -R node:node /app
 
 EXPOSE 3000
 

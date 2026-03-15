@@ -7,7 +7,13 @@ app.use(cors());
 app.use(express.json());
 
 const dbPath = process.env.DATABASE_URL || '/data/database.db';
-const db = new sqlite3.Database(dbPath);
+const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+    if (err) {
+        console.error("Erro crítico ao abrir banco:", err.message);
+    } else {
+        console.log("Banco de dados conectado com sucesso em:", dbPath);
+    }
+});
 
 db.serialize(() => {
   const sql = `
@@ -71,16 +77,14 @@ app.get("/funcionarios/:id", (req, res) => {
 
 app.post('/funcionarios', (req, res) => {
   const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
+  const sql = `INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-  const sql = `
-    INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
+  const params = [nome, email, cargo, departamento, salario, data_admissao, status];
 
-  db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status], function (err) {
+  db.run(sql, params, function (err) {
     if (err) {
-      res.status(500).json({ erro: err.message });
-      return;
+      console.error("Erro no POST:", err.message);
+      return res.status(500).json({ erro: err.message });
     }
     res.json({ id: this.lastID, mensagem: "Funcionário criado" });
   });
@@ -90,11 +94,17 @@ app.put('/funcionarios/:id', (req, res) => {
   const { id } = req.params;
   const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
 
-  const sql = `UPDATE funcionarios SET nome=?, email=?, cargo=?, departamento=?, salario=?, data_admissao=?, status=? WHERE id=?`;
+  const sql = `
+    UPDATE funcionarios
+    SET nome=?, email=?, cargo=?, departamento=?, salario=?, data_admissao=?, status=?
+    WHERE id=?
+  `;
 
-  db.run(sql, [nome, email, cargo, departamento, salario, data_admissao, status, id], function (err) {
+  const params = [nome, email, cargo, departamento, salario, data_admissao, status, id];
+
+  db.run(sql, params, function (err) {
     if (err) {
-      console.error(err.message);
+      console.error("Erro no PUT:", err.message);
       return res.status(500).json({ erro: err.message });
     }
     res.json({ mensagem: "Funcionário atualizado" });
@@ -105,7 +115,8 @@ app.delete('/funcionarios/:id', (req, res) => {
   const { id } = req.params;
   db.run("DELETE FROM funcionarios WHERE id=?", [id], function (err) {
     if (err) {
-      return res.status(500).json({ erro: err.message });
+      res.status(500).json({ erro: err.message });
+      return;
     }
     res.json({ mensagem: "Funcionário removido" });
   });
