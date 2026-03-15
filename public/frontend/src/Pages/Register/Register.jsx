@@ -1,10 +1,14 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { valida } from "../../utils/validacao.js";
+
+const API = "https://server-crimson-haze-2799.fly.dev/funcionarios";
 
 export default function Register() {
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get("id");
 
     const [form, setForm] = useState({
         nome: "",
@@ -15,6 +19,35 @@ export default function Register() {
         data_admissao: "",
         status: "Ativo"
     });
+
+    useEffect(() => {
+
+        if (!id) return;
+
+        async function carregarFuncionario() {
+            try {
+                const resposta = await fetch(`${API}/${id}`);
+                const dados = await resposta.json();
+
+                setForm({
+                    nome: dados.nome || "",
+                    email: dados.email || "",
+                    cargo: dados.cargo || "",
+                    departamento: dados.departamento || "",
+                    salario: dados.salario || "",
+                    data_admissao:
+                        dados.data_admissao?.split("T")[0] || "",
+                    status: dados.status || "Ativo"
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar funcionário:", error);
+            }
+        }
+
+        carregarFuncionario();
+
+    }, [id]);
 
     function handleChange(e) {
         setForm({
@@ -30,12 +63,16 @@ export default function Register() {
 
         inputs.forEach(input => valida(input));
 
-        const formularioValido = [...inputs].every(input => input.validity.valid);
+        const formularioValido =
+            [...inputs].every(input => input.validity.valid);
 
         if (!formularioValido) return;
 
-        await fetch("https://server-crimson-haze-2799.fly.dev/funcionarios", {
-            method: "POST",
+        const url = id ? `${API}/${id}` : API;
+        const metodo = id ? "PUT" : "POST";
+
+        await fetch(url, {
+            method: metodo,
             headers: {
                 "Content-Type": "application/json"
             },
@@ -49,7 +86,7 @@ export default function Register() {
         <div className="page">
             <div className="main-content">
 
-                <h1>Novo Funcionário</h1>
+                {id ? "Editar Funcionário" : "Novo Funcionário"}
 
                 <form className="form" onSubmit={handleSubmit} noValidate>
 
@@ -150,7 +187,7 @@ export default function Register() {
 
                     <div className="actions">
                         <button type="submit" className="btn primary">
-                            Cadastrar
+                            {id ? "Salvar Alterações" : "Cadastrar"}
                         </button>
 
                         <button
@@ -160,6 +197,7 @@ export default function Register() {
                         >
                             Cancelar
                         </button>
+
                     </div>
 
                 </form>

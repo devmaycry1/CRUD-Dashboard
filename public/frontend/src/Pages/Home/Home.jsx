@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import Header from "../../components/Header/Header";
 import UserTable from "../../components/UserTable/UserTable";
-import { useNavigate } from "react-router-dom";
+
 
 const API = "https://server-crimson-haze-2799.fly.dev/funcionarios";
 
