@@ -10,8 +10,7 @@ export default function Header() {
 
   function abrirDashboard() {
     window.open(
-      "https://docs.google.com/spreadsheets",
-      "_blank"
+      "https://docs.google.com/spreadsheets/d/1QDD_ImMmftsl1sLyHBjkkoq12IZtos5gXOhMgkjti8E/edit?usp=sharing"
     );
   }
 
