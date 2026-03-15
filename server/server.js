@@ -3,16 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 
 const app = express();
-app.use(cors({
-  origin: [
-    "https://crud-dashboard-ruddy.vercel.app",
-    "http://localhost:5173"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"]
-}));
-
-app.options('*', cors());
+app.use(cors());
 app.use(express.json());
 app.use(express.json());
 
