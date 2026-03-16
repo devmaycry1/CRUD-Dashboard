@@ -1,50 +1,12 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-const fs = require('fs');
-const path = require('path');
-
-// Função para migrar dados do JSON para o SQLite
-function executarMigracao() {
-  const jsonPath = path.join(__dirname, 'dados.json');
-
-  // Verifica se o arquivo de migração existe
-  if (fs.existsSync(jsonPath)) {
-    console.log("Arquivo de migração encontrado. Iniciando...");
-
-    const dados = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-
-    db.serialize(() => {
-      const stmt = db.prepare(`
-                INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `);
-
-      dados.forEach(f => {
-        stmt.run(f.nome, f.email, f.cargo, f.departamento, f.salario, f.data_admissao, f.status);
-      });
-
-      stmt.finalize((err) => {
-        if (!err) {
-          console.log(`${dados.length} funcionários migrados com sucesso!`);
-          // Opcional: deletar o arquivo após migrar para não repetir no próximo deploy
-          // fs.unlinkSync(jsonPath); 
-        }
-      });
-    });
-  }
-}
-
-// Chame a função após garantir que a tabela existe
-db.serialize(() => {
-  // ... seu código de CREATE TABLE IF NOT EXISTS ...
-  executarMigracao();
-});
 
 const dbPath = process.env.DATABASE_URL || '/data/database.db';
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -54,6 +16,25 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
     console.log("Banco de dados conectado com sucesso em:", dbPath);
   }
 });
+
+function executarMigracao() {
+  const jsonPath = path.join(__dirname, 'dados.json');
+  if (fs.existsSync(jsonPath)) {
+    console.log("Migrando dados...");
+    const dados = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+    db.serialize(() => {
+      const stmt = db.prepare(`
+                INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `);
+      dados.forEach(f => {
+        stmt.run(f.nome, f.email, f.cargo, f.departamento, f.salario, f.data_admissao, f.status);
+      });
+      stmt.finalize(() => console.log("Migração concluída!"));
+    });
+  }
+}
 
 db.serialize(() => {
   const sql = `
@@ -67,16 +48,18 @@ db.serialize(() => {
     data_admissao TEXT,
     status TEXT
   );
-  `;
+  `
 
   db.run(sql, (err) => {
     if (err) {
       console.error("Erro ao criar tabela:", err.message);
     } else {
       console.log("Banco de dados pronto.");
+      executarMigracao();
     }
   });
 });
+
 app.get('/', (req, res) => {
   res.send('API Funcionando!');
 });
