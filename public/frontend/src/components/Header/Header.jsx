@@ -5,7 +5,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   function exportarCSV() {
-    window.location.href = "https://server-crimson-haze-2799.fly.dev/exportar";
+    window.location.href = "crud-dashboard-production.up.railway.app/exportar";
   }
 
   function abrirDashboard() {
