@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { valida } from "../../utils/validacao.js";
 
-const API = "crud-dashboard-production.up.railway.app/funcionarios";
+const API = "https://crud-dashboard-production.up.railway.app/funcionarios";
 
 export default function Register() {
 

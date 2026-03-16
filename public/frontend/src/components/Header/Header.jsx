@@ -5,7 +5,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   function exportarCSV() {
-    window.location.href = "crud-dashboard-production.up.railway.app/exportar";
+    window.location.href = "https://crud-dashboard-production.up.railway.app/exportar";
   }
 
   function abrirDashboard() {

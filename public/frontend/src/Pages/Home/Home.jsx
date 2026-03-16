@@ -5,7 +5,7 @@ import Header from "../../components/Header/Header";
 import UserTable from "../../components/UserTable/UserTable";
 
 
-const API = "crud-dashboard-production.up.railway.app/funcionarios";
+const API = "https://crud-dashboard-production.up.railway.app/funcionarios";
 
 export default function Home() {
     const navigate = useNavigate();
