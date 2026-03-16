@@ -1,9 +1,12 @@
 export default function UserTable({ funcionarios, onEditar, onExcluir }) {
 
     function formatarData(dataISO) {
-        if (!dataISO) return "";
-        return new Date(dataISO).toLocaleDateString("pt-BR");
-    }
+    if (!dataISO) return "";
+    
+    const [ano, mes, dia] = dataISO.split("-");
+    
+    return `${dia}/${mes}/${ano}`;
+}
 
     function formatarSalario(valor) {
         if (!valor) return "";
