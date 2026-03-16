@@ -1,8 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -16,43 +14,6 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
     console.log("Banco de dados conectado com sucesso em:", dbPath);
   }
 });
-
-function executarMigracao() {
-  // Tenta o caminho absoluto baseado na raiz do projeto no Railway
-  const jsonPath = '/app/dados.json';
-
-  console.log("Checando existência do arquivo em:", jsonPath);
-
-  if (fs.existsSync(jsonPath)) {
-    console.log("Arquivo encontrado! Iniciando leitura...");
-    try {
-      const conteudo = fs.readFileSync(jsonPath, 'utf8');
-      const dados = JSON.parse(conteudo);
-
-      db.serialize(() => {
-        const stmt = db.prepare(`
-                    INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                `);
-
-        dados.forEach(f => {
-          stmt.run(f.nome, f.email, f.cargo, f.departamento, f.salario, f.data_admissao, f.status);
-        });
-
-        stmt.finalize(() => {
-          console.log("MIGRAÇÃO CONCLUÍDA COM SUCESSO!");
-          // Opcional: fs.unlinkSync(jsonPath); // Deleta após migrar
-        });
-      });
-    } catch (erro) {
-      console.error("Erro ao processar JSON:", erro.message);
-    }
-  } else {
-    console.error("ERRO CRÍTICO: dados.json não existe em /app/");
-    // Vamos listar o que tem na pasta para debugar via log
-    console.log("Arquivos na pasta /app:", fs.readdirSync('/app'));
-  }
-}
 
 db.serialize(() => {
   const sql = `
@@ -73,7 +34,6 @@ db.serialize(() => {
       console.error("Erro ao criar tabela:", err.message);
     } else {
       console.log("Banco de dados pronto.");
-      executarMigracao();
     }
   });
 });
