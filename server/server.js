@@ -18,21 +18,39 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
 });
 
 function executarMigracao() {
-  const jsonPath = path.join(__dirname, 'dados.json');
-  if (fs.existsSync(jsonPath)) {
-    console.log("Migrando dados...");
-    const dados = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  // Tenta o caminho absoluto baseado na raiz do projeto no Railway
+  const jsonPath = '/app/dados.json';
 
-    db.serialize(() => {
-      const stmt = db.prepare(`
-                INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `);
-      dados.forEach(f => {
-        stmt.run(f.nome, f.email, f.cargo, f.departamento, f.salario, f.data_admissao, f.status);
+  console.log("Checando existência do arquivo em:", jsonPath);
+
+  if (fs.existsSync(jsonPath)) {
+    console.log("Arquivo encontrado! Iniciando leitura...");
+    try {
+      const conteudo = fs.readFileSync(jsonPath, 'utf8');
+      const dados = JSON.parse(conteudo);
+
+      db.serialize(() => {
+        const stmt = db.prepare(`
+                    INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                `);
+
+        dados.forEach(f => {
+          stmt.run(f.nome, f.email, f.cargo, f.departamento, f.salario, f.data_admissao, f.status);
+        });
+
+        stmt.finalize(() => {
+          console.log("MIGRAÇÃO CONCLUÍDA COM SUCESSO!");
+          // Opcional: fs.unlinkSync(jsonPath); // Deleta após migrar
+        });
       });
-      stmt.finalize(() => console.log("Migração concluída!"));
-    });
+    } catch (erro) {
+      console.error("Erro ao processar JSON:", erro.message);
+    }
+  } else {
+    console.error("ERRO CRÍTICO: dados.json não existe em /app/");
+    // Vamos listar o que tem na pasta para debugar via log
+    console.log("Arquivos na pasta /app:", fs.readdirSync('/app'));
   }
 }
 
