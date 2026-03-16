@@ -6,13 +6,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const fs = require('fs');
+
+function migrarDados() {
+  const dados = JSON.parse(fs.readFileSync('./dados.json', 'utf8'));
+  dados.forEach(f => {
+    db.run(`INSERT INTO funcionarios (...) VALUES (?, ?, ...)`, [f.nome, f.email, ...]);
+  });
+}
+
 const dbPath = process.env.DATABASE_URL || '/data/database.db';
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-    if (err) {
-        console.error("Erro crítico ao abrir banco:", err.message);
-    } else {
-        console.log("Banco de dados conectado com sucesso em:", dbPath);
-    }
+  if (err) {
+    console.error("Erro crítico ao abrir banco:", err.message);
+  } else {
+    console.log("Banco de dados conectado com sucesso em:", dbPath);
+  }
 });
 
 db.serialize(() => {
