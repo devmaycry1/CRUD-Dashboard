@@ -1,52 +1,39 @@
-import { useNavigate } from "react-router-dom";
+import { MdSearch, MdMenu } from "react-icons/md";
+import { useLocation } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ searchQuery = "", setSearchQuery = () => { }, toggleSidebar }) {
+    const location = useLocation();
+    const dataAtual = new Date().toLocaleDateString('pt-BR', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
 
-  const navigate = useNavigate();
+    const showSearch = location.pathname === "/";
 
-  function exportarCSV() {
-    window.location.href = "https://crud-dashboard-production.up.railway.app/exportar";
-  }
+    return (
+        <header className="top-header">
 
-  function abrirDashboard() {
-    window.open(
-      "https://docs.google.com/spreadsheets/d/1QDD_ImMmftsl1sLyHBjkkoq12IZtos5gXOhMgkjti8E/edit?usp=sharing"
+            <button className="menu-toggle-btn" onClick={toggleSidebar}>
+                <MdMenu size={26} />
+            </button>
+
+            {/* LÓGICA CORRIGIDA: Se showSearch for true, mostra o input. Se não, mostra o título. */}
+            {showSearch ? (
+                <div className="search-container">
+                    <MdSearch className="search-icon" />
+                    <input
+                        type="text"
+                        className="search-input"
+                        placeholder="Buscar funcionários..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            ) : (
+                <div className="header-title-block">
+                    <h2>{location.pathname === "/dashboard" ? "Dashboard" : "Sistema de RH"}</h2>
+                    <span className="current-date">{dataAtual}</span>
+                </div>
+            )}
+        </header>
     );
-  }
-
-  return (
-    <div className="dashboard-header">
-
-      <div>
-        <h1>Funcionários</h1>
-        <p>Gerencie sua equipe</p>
-      </div>
-
-      <div className="actions">
-
-        <button
-          className="btn dashboard"
-          onClick={abrirDashboard}
-        >
-          Dashboard
-        </button>
-
-        <button
-          className="btn secondary"
-          onClick={exportarCSV}
-        >
-          Exportar CSV
-        </button>
-
-        <button
-          className="btn primary"
-          onClick={() => navigate("/cadastro")}
-        >
-          Novo Funcionário
-        </button>
-
-      </div>
-
-    </div>
-  );
 }

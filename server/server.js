@@ -1,12 +1,13 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const dbPath = process.env.DATABASE_URL || '/data/database.db';
+const dbPath = process.env.DATABASE_URL || path.join(__dirname, 'database.db');
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
     console.error("Erro crítico ao abrir banco:", err.message);

@@ -1,26 +1,19 @@
 export default function UserTable({ funcionarios, onEditar, onExcluir }) {
 
     function formatarData(dataISO) {
-    if (!dataISO) return "";
-    
-    const [ano, mes, dia] = dataISO.split("-");
-    
-    return `${dia}/${mes}/${ano}`;
-}
+        if (!dataISO) return "";
+        const [ano, mes, dia] = dataISO.split("-");
+        return `${dia}/${mes}/${ano}`;
+    }
 
     function formatarSalario(valor) {
         if (!valor) return "";
-        return Number(valor).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
+        return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
     return (
         <div className="table-container">
-
             <table className="tabela-funcionarios">
-
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -33,66 +26,38 @@ export default function UserTable({ funcionarios, onEditar, onExcluir }) {
                         <th>Ações</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     {funcionarios.length === 0 ? (
-                        <tr>
-                            <td colSpan="8">
-                                Nenhum funcionário cadastrado
-                            </td>
-                        </tr>
+                        <tr><td colSpan="8">Nenhum funcionário cadastrado</td></tr>
                     ) : (
-
                         funcionarios.map((f) => (
-
                             <tr key={f.id}>
-
                                 <td>{f.nome}</td>
                                 <td>{f.email}</td>
                                 <td>{f.cargo}</td>
                                 <td>{f.departamento}</td>
-
+                                <td>{formatarSalario(f.salario)}</td>
+                                <td>{formatarData(f.data_admissao)}</td>
                                 <td>
-                                    {formatarSalario(f.salario)}
+                                    <span className={`status-badge ${f.status === 'Ativo' ? 'status-ativo' : 'status-inativo'}`}>
+                                        {f.status}
+                                    </span>
                                 </td>
-
                                 <td>
-                                    {formatarData(f.data_admissao)}
+                                    <div className="button-container">
+                                        <button className="botao-acao editar" onClick={() => onEditar(f.id)}>
+                                            Editar
+                                        </button>
+                                        <button className="botao-acao excluir" onClick={() => onExcluir(f.id)}>
+                                            Excluir
+                                        </button>
+                                    </div>
                                 </td>
-
-                                <td>
-                                    {f.status}
-                                </td>
-
-                                <td>
-
-                                    <button
-                                        className="botao-editar"
-                                        onClick={() => onEditar(f.id)}
-                                    >
-                                        Editar
-                                    </button>
-
-                                    <button
-                                        className="botao-excluir"
-                                        onClick={() => onExcluir(f.id)}
-                                    >
-                                        Excluir
-                                    </button>
-
-                                </td>
-
                             </tr>
-
                         ))
-
                     )}
-
                 </tbody>
-
             </table>
-
         </div>
     );
 }
