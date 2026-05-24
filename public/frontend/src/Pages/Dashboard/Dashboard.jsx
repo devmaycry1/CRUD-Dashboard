@@ -32,7 +32,7 @@ ChartJS.register(
     Filler
 );
 
-const API = "http://localhost:3000/funcionarios";
+const API = "https://backend-sag-50g0.onrender.com/funcionarios";
 
 export default function Dashboard() {
     const [stats, setStats] = useState({

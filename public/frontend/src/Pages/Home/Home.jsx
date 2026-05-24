@@ -6,7 +6,7 @@ import UserTable from "../../components/UserTable/UserTable";
 import { MdPersonAdd } from "react-icons/md";
 import toast from "react-hot-toast";
 
-const API = "http://localhost:3000/funcionarios";
+const API = "https://backend-sag-50g0.onrender.com/funcionarios";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -97,7 +97,7 @@ export default function Home() {
     }
 
     function exportarCSV() {
-        window.location.href = "http://localhost:3000/exportar";
+        window.location.href = "https://backend-sag-50g0.onrender.com/exportar";
     }
 
     const funcionariosFiltrados = funcionarios.filter((f) => {

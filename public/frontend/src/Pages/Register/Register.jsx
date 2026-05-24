@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import Header from "../../components/Header/Header";
 import toast from "react-hot-toast";
 
-const API = "http://localhost:3000/funcionarios";
+const API = "https://backend-sag-50g0.onrender.com/funcionarios";
 
 export default function Register() {
     const navigate = useNavigate();
