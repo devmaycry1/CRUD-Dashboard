@@ -1,23 +1,20 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
-const path = require('path');
+require('dotenv').config();
+const { createClient } = require('@libsql/client');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const dbPath = process.env.DATABASE_URL || path.join(__dirname, 'database.db');
-const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-  if (err) {
-    console.error("Erro crítico ao abrir banco:", err.message);
-  } else {
-    console.log("Banco de dados conectado com sucesso em:", dbPath);
-  }
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN
 });
 
-db.serialize(() => {
-  const sql = `
+console.log("Tentando conectar ao banco de dados Turso...");
+
+db.execute(`
   CREATE TABLE IF NOT EXISTS funcionarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -28,116 +25,118 @@ db.serialize(() => {
     data_admissao TEXT,
     status TEXT
   );
-  `
-
-  db.run(sql, (err) => {
-    if (err) {
-      console.error("Erro ao criar tabela:", err.message);
-    } else {
-      console.log("Banco de dados pronto.");
-    }
-  });
+`).then(() => {
+  console.log("Banco de dados pronto e conectado na nuvem!");
+}).catch((err) => {
+  console.error("Erro ao criar/verificar tabela:", err.message);
 });
 
 app.get('/', (req, res) => {
-  res.send('API Funcionando!');
+  res.send('API Funcionando com Turso!');
 });
 
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+app.get('/funcionarios', async (req, res) => {
+  try {
+    const resultado = await db.execute("SELECT * FROM funcionarios");
+    // O Turso devolve os registos na propriedade 'rows'
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error("Erro no GET:", err.message);
+    res.status(500).json({ erro: err.message });
+  }
 });
 
-app.get('/funcionarios', (req, res) => {
-  db.all("SELECT * FROM funcionarios", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ erro: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
+app.get("/funcionarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-app.get("/funcionarios/:id", (req, res) => {
-  const { id } = req.params;
+    const resultado = await db.execute({
+      sql: "SELECT * FROM funcionarios WHERE id = ?",
+      args: [id]
+    });
 
-  db.get("SELECT * FROM funcionarios WHERE id = ?", [id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ erro: err.message });
-    }
-
-    if (!row) {
+    if (resultado.rows.length === 0) {
       return res.status(404).json({ erro: "Funcionário não encontrado" });
     }
 
-    res.json(row);
-  });
+    res.json(resultado.rows[0]);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
 });
 
+app.post('/funcionarios', async (req, res) => {
+  try {
+    const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
 
-app.post('/funcionarios', (req, res) => {
-  const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
-  const sql = `INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const resultado = await db.execute({
+      sql: `INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [nome, email, cargo, departamento, salario, data_admissao, status]
+    });
 
-  const params = [nome, email, cargo, departamento, salario, data_admissao, status];
-
-  db.run(sql, params, function (err) {
-    if (err) {
-      console.error("Erro no POST:", err.message);
-      return res.status(500).json({ erro: err.message });
-    }
-    res.json({ id: this.lastID, mensagem: "Funcionário criado" });
-  });
+    res.status(201).json({
+      id: Number(resultado.lastInsertRowid),
+      mensagem: "Funcionário criado"
+    });
+  } catch (err) {
+    console.error("Erro no POST:", err.message);
+    res.status(500).json({ erro: err.message });
+  }
 });
 
-app.put('/funcionarios/:id', (req, res) => {
-  const { id } = req.params;
-  const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
+app.put('/funcionarios/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome, email, cargo, departamento, salario, data_admissao, status } = req.body;
 
-  const sql = `
-    UPDATE funcionarios
-    SET nome=?, email=?, cargo=?, departamento=?, salario=?, data_admissao=?, status=?
-    WHERE id=?
-  `;
+    await db.execute({
+      sql: `UPDATE funcionarios SET nome=?, email=?, cargo=?, departamento=?, salario=?, data_admissao=?, status=? WHERE id=?`,
+      args: [nome, email, cargo, departamento, salario, data_admissao, status, id]
+    });
 
-  const params = [nome, email, cargo, departamento, salario, data_admissao, status, id];
-
-  db.run(sql, params, function (err) {
-    if (err) {
-      console.error("Erro no PUT:", err.message);
-      return res.status(500).json({ erro: err.message });
-    }
     res.json({ mensagem: "Funcionário atualizado" });
-  });
+  } catch (err) {
+    console.error("Erro no PUT:", err.message);
+    res.status(500).json({ erro: err.message });
+  }
 });
 
-app.delete('/funcionarios/:id', (req, res) => {
-  const { id } = req.params;
-  db.run("DELETE FROM funcionarios WHERE id=?", [id], function (err) {
-    if (err) {
-      res.status(500).json({ erro: err.message });
-      return;
-    }
+app.delete('/funcionarios/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.execute({
+      sql: "DELETE FROM funcionarios WHERE id=?",
+      args: [id]
+    });
+
     res.json({ mensagem: "Funcionário removido" });
-  });
+  } catch (err) {
+    console.error("Erro no DELETE:", err.message);
+    res.status(500).json({ erro: err.message });
+  }
 });
 
-app.get('/exportar', (req, res) => {
-  db.all("SELECT * FROM funcionarios", [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ erro: err.message });
-    }
+app.get('/exportar', async (req, res) => {
+  try {
+    const resultado = await db.execute("SELECT * FROM funcionarios");
 
     let csv = "id,nome,email,cargo,departamento,salario,data_admissao,status\n";
 
-    rows.forEach(f => {
+    resultado.rows.forEach(f => {
       csv += `${f.id},${f.nome},${f.email},${f.cargo},${f.departamento},${f.salario},${f.data_admissao},${f.status}\n`;
     });
 
     res.header("Content-Type", "text/csv");
     res.attachment("funcionarios.csv");
     res.send(csv);
-  });
-})
+  } catch (err) {
+    console.error("Erro na exportação:", err.message);
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
