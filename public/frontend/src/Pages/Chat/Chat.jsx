@@ -94,6 +94,24 @@ export default function Chat() {
       titulo: "Status dos Funcionários",
       subtitulo: "Quantos colaboradores estão ativos?",
     },
+    {
+      titulo: "Projeção Financeira",
+      subtitulo:
+        "Mantendo a taxa atual, qual o custo da folha daqui a 3 meses?",
+    },
+    {
+      titulo: "Previsão de Crescimento",
+      subtitulo:
+        "Baseado no histórico, qual o tamanho da equipa no fim do semestre?",
+    },
+    {
+      titulo: "Tendência de Admissões",
+      subtitulo: "Qual é a nossa média atual de contratações por mês?",
+    },
+    {
+      titulo: "Resumo Atual",
+      subtitulo: "Qual é o custo total da folha salarial hoje?",
+    }
   ];
 
   return (
