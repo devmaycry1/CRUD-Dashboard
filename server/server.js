@@ -141,12 +141,10 @@ app.post("/funcionarios", async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
       args: [nome, email, cargo, departamento, salario, data_admissao, status],
     });
-    res
-      .status(201)
-      .json({
-        id: Number(resultado.lastInsertRowid),
-        mensagem: "Funcionário criado com sucesso.",
-      });
+    res.status(201).json({
+      id: Number(resultado.lastInsertRowid),
+      mensagem: "Funcionário criado com sucesso.",
+    });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
@@ -171,6 +169,21 @@ app.put("/funcionarios/:id", async (req, res) => {
       ],
     });
     res.json({ mensagem: "Funcionário atualizado." });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+app.get("/funcionarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await db.execute({
+      sql: "SELECT * FROM funcionarios WHERE id = ?",
+      args: [id],
+    });
+    if (resultado.rows.length === 0)
+      return res.status(404).json({ erro: "Funcionário não encontrado" });
+    res.json(resultado.rows[0]);
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }

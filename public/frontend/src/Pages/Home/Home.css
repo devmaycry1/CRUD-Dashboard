@@ -35,8 +35,8 @@
 
 .employee-card {
   background: var(--bg-superficie);
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: 1px solid #89c0ff;
+  border-radius: 14px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -128,7 +128,7 @@
 
 .rows-per-page select {
   padding: 8px 12px;
-  border-radius: 8px; 
+  border-radius: 8px;
   border: 1px solid var(--cor-borda);
   background-color: var(--bg-superficie);
   color: var(--texto-principal);
@@ -142,7 +142,7 @@
 }
 
 .rows-per-page select:hover {
-  border-color: #93c5fd; 
+  border-color: #93c5fd;
 }
 
 .rows-per-page select:focus {
@@ -172,7 +172,7 @@
 .pagination-btn:hover:not(:disabled) {
   background-color: #eff6ff;
   color: var(--cor-primaria);
-  border-color: #93c5fd;
+  border-color: #89c0ff;
   transform: translateY(-1px);
 }
 
@@ -221,4 +221,34 @@
     gap: 24px;
     align-items: flex-start;
   }
+}
+
+.employee-salary {
+  margin-top: 16px;
+  padding: 10px 14px;
+  background-color: #f8fafc; 
+  border: 1px solid #86bbff;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.employee-card:hover .employee-salary {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.employee-salary span {
+  font-size: 12px;
+  color: #364257;
+  font-weight: 500;
+}
+
+.employee-salary strong {
+  font-size: 14px;
+  color: #0f172a; 
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }

@@ -7,6 +7,12 @@ import toast from "react-hot-toast";
 import "./Home.css";
 
 const API = "https://backend-sag-50g0.onrender.com/funcionarios";
+const formatarMoeda = (valor) => {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(Number(valor) || 0);
+};
 
 export default function Home() {
   const navigate = useNavigate();
@@ -49,60 +55,41 @@ export default function Home() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
-            minWidth: "250px",
+            gap: "10px",
+            minWidth: "300px",
           }}
         >
           <span
             style={{
-              fontWeight: 600,
+              fontWeight: 700,
               color: "var(--texto-principal)",
-              fontSize: "15px",
+              fontSize: "16px",
             }}
           >
             Deseja excluir este funcionário?
           </span>
-          <span style={{ fontSize: "13px", color: "var(--texto-secundario)" }}>
-            Esta ação não poderá ser desfeita.
-          </span>
-
-          <div
+          <span
             style={{
-              display: "flex",
-              gap: "8px",
-              marginTop: "8px",
-              justifyContent: "flex-end",
+              fontSize: "14px",
+              color: "var(--texto-secundario)",
+              lineHeight: "1.4",
             }}
           >
+            Esta ação é irreversível e removerá todos os dados permanentemente.
+          </span>
+
+          <div className="toast-actions">
             <button
+              className="toast-btn toast-btn-cancel"
               onClick={() => toast.dismiss(t.id)}
-              style={{
-                background: "transparent",
-                color: "var(--texto-secundario)",
-                border: "1px solid var(--cor-borda)",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: 600,
-                transition: "0.2s",
-              }}
             >
               Cancelar
             </button>
             <button
+              className="toast-btn toast-btn-confirm"
               onClick={() => {
                 toast.dismiss(t.id);
                 executarExclusao(id);
-              }}
-              style={{
-                background: "var(--status-inativo-bg)",
-                color: "var(--status-inativo-texto)",
-                border: "none",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: 600,
-                transition: "0.2s",
               }}
             >
               Sim, Excluir
@@ -114,6 +101,12 @@ export default function Home() {
         duration: Infinity,
         position: "top-center",
         id: `toast-confirm-${id}`,
+        style: {
+          padding: "20px",
+          borderRadius: "16px",
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        },
       },
     );
   }
@@ -196,6 +189,11 @@ export default function Home() {
                 <div className="info-line">
                   <MdMailOutline size={16} />
                   <span>{func.email}</span>
+                </div>
+
+                <div className="employee-salary">
+                  <span>Salário base:</span>
+                  <strong>{formatarMoeda(func.salario)}</strong>
                 </div>
               </div>
 

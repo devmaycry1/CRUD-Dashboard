@@ -34,13 +34,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================
-   BOTÕES GLOBAIS E BADGES
-   ========================================= */
 .btn {
   border: none;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
@@ -53,7 +50,7 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, #1c5de7, #0c42d6);
   color: #fff;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
   border: 1px solid transparent;
@@ -62,7 +59,7 @@ body {
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-  border-color: #93c5fd;
+  border-color: #3186e7;
 }
 
 .btn-success {
@@ -82,8 +79,8 @@ body {
 
 .btn-secondary {
   background-color: #ffffff;
-  color: var(--texto-secundario);
-  border: 1px solid var(--cor-borda);
+  color: rgb(255, 65, 65);
+  border: 1px solid rgb(255, 65, 65);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 }
 
@@ -108,9 +105,54 @@ body {
   background-color: #f8fafc;
 }
 
+.toast-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: space-evenly;
+  align-items: center; 
+}
+
+.toast-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-btn-cancel {
+  background: #ffffff;
+  color: #5197ff;
+  border-color: #5297ff;
+}
+
+.toast-btn-cancel:hover {
+  background: #d3e6ff;
+  color: #3973cf;
+}
+
+.toast-btn-confirm {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.toast-btn-confirm:hover {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
+}
+
 .botao-acao.editar {
   color: #2563eb;
 }
+
 .botao-acao.editar:hover {
   background-color: #eff6ff;
   border-color: #bfdbfe;
@@ -121,6 +163,7 @@ body {
 .botao-acao.excluir {
   color: #dc2626;
 }
+
 .botao-acao.excluir:hover {
   background-color: #fef2f2;
   border-color: #fecaca;
@@ -149,9 +192,6 @@ body {
   border: 1px solid #fecaca;
 }
 
-/* =========================================
-   LAYOUT PRINCIPAL
-   ========================================= */
 .app-layout {
   display: flex;
   height: 100vh;
@@ -176,9 +216,6 @@ body {
   transform: translateX(140px);
 }
 
-/* =========================================
-   FORMULÁRIOS E INPUTS
-   ========================================= */
 .form-container {
   max-width: 800px;
   width: 100%;
@@ -193,7 +230,7 @@ body {
   background: var(--bg-superficie);
   padding: 32px;
   border-radius: 12px;
-  border: 1px solid var(--cor-borda);
+  border: 1px solid rgb(113, 179, 255);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -236,8 +273,8 @@ body {
 .input-group select {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 8px;
+  border: 1px solid rgb(113, 179, 255);
+  border-radius: 10px;
   background-color: var(--bg-fundo);
   color: var(--texto-principal);
   font-family: var(--fonte-familia-corpo);
