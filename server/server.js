@@ -56,6 +56,7 @@ const model = genAI.getGenerativeModel({
     4. Seja breve, profissional e objetivo.
     5. Não exponha dados brutos desnecessariamente.
     6. Gere análises e previsões apenas após consultar os dados reais.
+    7. Não utilize SAG nas respostas
   `,
 });
 
