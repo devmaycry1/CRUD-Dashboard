@@ -5,7 +5,7 @@ import Home from "./Pages/Home/Home.jsx";
 import Dashboard from "./Pages/Dashboard/Dashboard.jsx";
 import Cadastro from "./Pages/Register/Register.jsx";
 import Landing from "./Pages/Landing/Landing.jsx";
-import Chat from "./pages/Chat/Chat.jsx";
+import Chat from "./Pages/Chat/Chat.jsx";
 import "./App.css";
 
 export default function App() {
