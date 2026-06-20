@@ -21,7 +21,7 @@ const tools = [
       {
         name: "getDadosRH",
         description:
-          "Busca todos os dados atuais de funcionários, salários, departamentos e datas de admissão do sistema SAG. Use esta função para qualquer análise, previsão ou consulta sobre a equipa.",
+          "Busca todos os dados atuais de funcionários, salários, departamentos e cargos. OBRIGATÓRIO usar esta função para responder perguntas sobre dados da empresa.",
       },
     ],
   },
@@ -32,6 +32,7 @@ const model = genAI.getGenerativeModel({
   tools: tools,
 });
 
+// Inicialização do Banco
 db.execute(
   `
   CREATE TABLE IF NOT EXISTS funcionarios (
@@ -54,19 +55,31 @@ app.post("/chat", async (req, res) => {
     const { mensagem } = req.body;
     console.log("Mensagem recebida:", mensagem);
 
-    const chat = model.startChat();
+    // Instruções rigorosas para evitar respostas poluídas e forçar o uso da ferramenta
+    const chat = model.startChat({
+      history: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `Você é o Personna Copilot, assistente de RH. 
+            REGRA 1: Para qualquer pergunta sobre funcionários, departamentos, salários ou previsões, chame a ferramenta getDadosRH.
+            REGRA 2: Não invente dados. Se não tiver os dados, chame a ferramenta.
+            REGRA 3: Seja breve, profissional e direto. Não mostre cálculos passo a passo ou tabelas de dados brutos. 
+            REGRA 4: Se o usuário pedir previsões, use sua capacidade analítica após chamar a função.`,
+            },
+          ],
+        },
+      ],
+    });
+
     let result = await chat.sendMessage(mensagem);
-
-    // Log para ver se a IA tentou chamar a ferramenta
-    console.log("IA respondeu. Chamou ferramenta?", !!result.functionCalls);
-
     let call = result.functionCalls && result.functionCalls[0];
 
     if (call && call.name === "getDadosRH") {
-      console.log("IA solicitou getDadosRH. Buscando dados no banco...");
+      console.log("IA solicitando getDadosRH...");
       const dbResult = await db.execute("SELECT * FROM funcionarios");
 
-      console.log("Dados buscados. Enviando de volta para a IA...");
       result = await chat.sendMessage([
         {
           functionResponse: {
@@ -78,11 +91,9 @@ app.post("/chat", async (req, res) => {
     }
 
     const respostaFinal = result.response.text();
-    console.log("Resposta final da IA gerada com sucesso.");
     res.json({ resposta: respostaFinal });
   } catch (error) {
-    // ESTA LINHA VAI MOSTRAR O ERRO NO LOG DO RENDER
-    console.error("ERRO DETALHADO NO CHAT:", error);
+    console.error("ERRO NO CHAT:", error);
     res
       .status(500)
       .json({ erro: "Erro ao processar solicitação: " + error.message });
@@ -106,10 +117,12 @@ app.post("/funcionarios", async (req, res) => {
       sql: `INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       args: [nome, email, cargo, departamento, salario, data_admissao, status],
     });
-    res.status(201).json({
-      id: Number(resultado.lastInsertRowid),
-      mensagem: "Funcionário criado",
-    });
+    res
+      .status(201)
+      .json({
+        id: Number(resultado.lastInsertRowid),
+        mensagem: "Funcionário criado",
+      });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
