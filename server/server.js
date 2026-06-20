@@ -52,27 +52,21 @@ db.execute(
 app.post("/chat", async (req, res) => {
   try {
     const { mensagem } = req.body;
-    if (!mensagem)
-      return res.status(400).json({ erro: "A mensagem é obrigatória." });
-    const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: "Você é o Personna Copilot, o assistente virtual de RH exclusivo do sistema Personna. Responda de forma extremamente breve, direta, profissional e nunca alucine dados fora da empresa. Use o nome 'Personna Copilot'. Se precisar de dados sobre funcionários, departamentos ou qualquer outro relacionado chame a ferramenta getDadosRH.",
-            },
-          ],
-        },
-      ],
-    });
+    console.log("Mensagem recebida:", mensagem);
 
+    const chat = model.startChat();
     let result = await chat.sendMessage(mensagem);
+
+    // Log para ver se a IA tentou chamar a ferramenta
+    console.log("IA respondeu. Chamou ferramenta?", !!result.functionCalls);
+
     let call = result.functionCalls && result.functionCalls[0];
 
     if (call && call.name === "getDadosRH") {
+      console.log("IA solicitou getDadosRH. Buscando dados no banco...");
       const dbResult = await db.execute("SELECT * FROM funcionarios");
 
+      console.log("Dados buscados. Enviando de volta para a IA...");
       result = await chat.sendMessage([
         {
           functionResponse: {
@@ -83,10 +77,15 @@ app.post("/chat", async (req, res) => {
       ]);
     }
 
-    res.json({ resposta: result.response.text() });
+    const respostaFinal = result.response.text();
+    console.log("Resposta final da IA gerada com sucesso.");
+    res.json({ resposta: respostaFinal });
   } catch (error) {
-    console.error("Erro na comunicação com o Gemini:", error);
-    res.status(500).json({ erro: "Erro ao processar sua solicitação." });
+    // ESTA LINHA VAI MOSTRAR O ERRO NO LOG DO RENDER
+    console.error("ERRO DETALHADO NO CHAT:", error);
+    res
+      .status(500)
+      .json({ erro: "Erro ao processar solicitação: " + error.message });
   }
 });
 
