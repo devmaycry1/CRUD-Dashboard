@@ -1,15 +1,27 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+
 const { createClient } = require("@libsql/client");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const requiredEnv = [
+  "GEMINI_API_KEY",
+  "TURSO_DATABASE_URL",
+  "TURSO_AUTH_TOKEN",
+];
+requiredEnv.forEach((envVar) => {
+  if (!process.env[envVar]) {
+    throw new Error(`Variável de ambiente ${envVar} não configurada.`);
+  }
+});
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const db = createClient({
   url: process.env.TURSO_DATABASE_URL,
   authToken: process.env.TURSO_AUTH_TOKEN,
@@ -21,82 +33,92 @@ const tools = [
       {
         name: "getDadosRH",
         description:
-          "Busca todos os dados atuais de funcionários, salários, departamentos e cargos. OBRIGATÓRIO usar esta função para responder perguntas sobre dados da empresa.",
+          "Obtém dados atualizados dos funcionários da empresa SAG. Deve ser utilizada para perguntas sobre funcionários, salários, cargos, departamentos, admissões e análises de RH.",
+        parameters: {
+          type: "object",
+          properties: {},
+          required: [],
+        },
       },
     ],
   },
 ];
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-flash-latest",
-  tools: tools,
+  model: "gemini-2.5-flash",
+  tools,
+  systemInstruction: `
+    Você é o Personna Copilot.
+    REGRAS:
+    1. Para qualquer pergunta relacionada a funcionários, salários, cargos, departamentos, admissões, RH, estatísticas ou previsões, VOCÊ DEVE utilizar a ferramenta getDadosRH.
+    2. Nunca invente dados.
+    3. Caso os dados não existam, informe claramente.
+    4. Seja breve, profissional e objetivo.
+    5. Não exponha dados brutos desnecessariamente.
+    6. Gere análises e previsões apenas após consultar os dados reais.
+  `,
 });
 
-// Inicialização do Banco
-db.execute(
-  `
-  CREATE TABLE IF NOT EXISTS funcionarios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    email TEXT NOT NULL,
-    cargo TEXT,
-    departamento TEXT,
-    salario REAL,
-    data_admissao TEXT,
-    status TEXT
-  );
-`,
-)
-  .then(() => console.log("Banco de dados pronto!"))
-  .catch((err) => console.error("Erro ao verificar tabela:", err.message));
+(async () => {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS funcionarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        email TEXT NOT NULL,
+        cargo TEXT,
+        departamento TEXT,
+        salario REAL,
+        data_admissao TEXT,
+        status TEXT
+      );
+    `);
+    console.log("Banco de dados pronto!");
+  } catch (err) {
+    console.error("Erro ao verificar tabela:", err);
+  }
+})();
 
 app.post("/chat", async (req, res) => {
   try {
     const { mensagem } = req.body;
+
+    if (!mensagem || !mensagem.trim()) {
+      return res.status(400).json({ erro: "Mensagem é obrigatória." });
+    }
+
     console.log("Mensagem recebida:", mensagem);
 
-    // Instruções rigorosas para evitar respostas poluídas e forçar o uso da ferramenta
-    const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `Você é o Personna Copilot, assistente de RH. 
-            REGRA 1: Para qualquer pergunta sobre funcionários, departamentos, salários ou previsões, chame a ferramenta getDadosRH.
-            REGRA 2: Não invente dados. Se não tiver os dados, chame a ferramenta.
-            REGRA 3: Seja breve, profissional e direto. Não mostre cálculos passo a passo ou tabelas de dados brutos. 
-            REGRA 4: Se o usuário pedir previsões, use sua capacidade analítica após chamar a função.`,
-            },
-          ],
-        },
-      ],
-    });
-
+    const chat = model.startChat();
     let result = await chat.sendMessage(mensagem);
-    let call = result.functionCalls && result.functionCalls[0];
 
-    if (call && call.name === "getDadosRH") {
-      console.log("IA solicitando getDadosRH...");
-      const dbResult = await db.execute("SELECT * FROM funcionarios");
+    const functionCalls = result.response.functionCalls?.() || [];
+    const call = functionCalls[0];
+
+    if (call?.name === "getDadosRH") {
+      console.log("Ferramenta getDadosRH solicitada.");
+
+      const dbResult = await db.execute(`
+        SELECT id, nome, cargo, departamento, salario, data_admissao, status
+        FROM funcionarios LIMIT 500
+      `);
 
       result = await chat.sendMessage([
         {
           functionResponse: {
             name: "getDadosRH",
-            response: { result: JSON.stringify(dbResult.rows) },
+            response: { funcionarios: dbResult.rows },
           },
         },
       ]);
     }
 
-    const respostaFinal = result.response.text();
+    const respostaFinal =
+      result.response.text() || "Não foi possível gerar uma resposta.";
     res.json({ resposta: respostaFinal });
   } catch (error) {
     console.error("ERRO NO CHAT:", error);
-    res
-      .status(500)
-      .json({ erro: "Erro ao processar solicitação: " + error.message });
+    res.status(500).json({ erro: error.message });
   }
 });
 
@@ -114,14 +136,15 @@ app.post("/funcionarios", async (req, res) => {
     const { nome, email, cargo, departamento, salario, data_admissao, status } =
       req.body;
     const resultado = await db.execute({
-      sql: `INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      sql: `INSERT INTO funcionarios (nome, email, cargo, departamento, salario, data_admissao, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
       args: [nome, email, cargo, departamento, salario, data_admissao, status],
     });
     res
       .status(201)
       .json({
         id: Number(resultado.lastInsertRowid),
-        mensagem: "Funcionário criado",
+        mensagem: "Funcionário criado com sucesso.",
       });
   } catch (err) {
     res.status(500).json({ erro: err.message });
@@ -146,7 +169,7 @@ app.put("/funcionarios/:id", async (req, res) => {
         id,
       ],
     });
-    res.json({ mensagem: "Funcionário atualizado" });
+    res.json({ mensagem: "Funcionário atualizado." });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
@@ -159,7 +182,7 @@ app.delete("/funcionarios/:id", async (req, res) => {
       sql: "DELETE FROM funcionarios WHERE id=?",
       args: [id],
     });
-    res.json({ mensagem: "Funcionário removido" });
+    res.json({ mensagem: "Funcionário removido." });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
@@ -169,16 +192,23 @@ app.get("/exportar", async (req, res) => {
   try {
     const resultado = await db.execute("SELECT * FROM funcionarios");
     let csv = "id,nome,email,cargo,departamento,salario,data_admissao,status\n";
-    resultado.rows.forEach(
-      (f) =>
-        (csv += `${f.id},${f.nome},${f.email},${f.cargo},${f.departamento},${f.salario},${f.data_admissao},${f.status}\n`),
-    );
+    resultado.rows.forEach((f) => {
+      csv += `${f.id},${f.nome},${f.email},${f.cargo},${f.departamento},${f.salario},${f.data_admissao},${f.status}\n`;
+    });
     res.header("Content-Type", "text/csv");
     res.attachment("funcionarios.csv");
     res.send(csv);
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
+});
+
+app.get("/", (req, res) => {
+  res.json({
+    status: "online",
+    servico: "SAG Backend",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 const PORT = process.env.PORT || 3000;
