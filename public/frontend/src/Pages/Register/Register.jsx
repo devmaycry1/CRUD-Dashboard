@@ -63,7 +63,7 @@ export default function Register() {
         toast.success("Novo funcionário cadastrado!");
       }
 
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       console.error(error);
       toast.error("Ocorreu um erro ao guardar os dados.");
