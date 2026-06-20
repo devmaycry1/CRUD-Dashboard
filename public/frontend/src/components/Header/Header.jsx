@@ -1,5 +1,6 @@
 import { MdSearch, MdMenu } from "react-icons/md";
 import { useLocation } from "react-router-dom";
+import "./Header.css"
 
 export default function Header({ searchQuery = "", setSearchQuery = () => { }, toggleSidebar }) {
     const location = useLocation();
@@ -16,7 +17,6 @@ export default function Header({ searchQuery = "", setSearchQuery = () => { }, t
                 <MdMenu size={26} />
             </button>
 
-            {/* LÓGICA CORRIGIDA: Se showSearch for true, mostra o input. Se não, mostra o título. */}
             {showSearch ? (
                 <div className="search-container">
                     <MdSearch className="search-icon" />
@@ -30,7 +30,7 @@ export default function Header({ searchQuery = "", setSearchQuery = () => { }, t
                 </div>
             ) : (
                 <div className="header-title-block">
-                    <h2>{location.pathname === "/dashboard" ? "Dashboard" : "Sistema de RH"}</h2>
+                    <h2>{location.pathname === "/dashboard" ? "Dashboard" : "Visão Geral"}</h2>
                     <span className="current-date">{dataAtual}</span>
                 </div>
             )}
